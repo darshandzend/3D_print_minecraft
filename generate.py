@@ -5,6 +5,7 @@ import subprocess
 
 from os import system
 
+DEFAULT_SUBSTANCE = 'air'
 DEFAULT_SUBSTANCE = 'smooth_stone'
 
 # Offsets determine the origin point (0,0,0) in 3D space
@@ -12,7 +13,7 @@ x_offset = 8
 y_offset = 8
 z_offset = 5
 
-height = 18
+height = 17
 length = height*2
 bredth = height*2
 
@@ -38,11 +39,16 @@ def fill_structure():
         center=(0,0,z)
         r = radius_at_level(z)
         draw_circle(r,center)
-        time.sleep(1)
+        #time.sleep(1)
 
 def radius_at_level(z):
+    # Tip: To picture this curve better, just rotate your imaginary x-y axis
+    # such that 'z' variable is horizontal, growing rightwards
+
+    x = height-z
+
     #return math.floor( math.sqrt ( height**2 - z**2 ) ) -1  # Circle
-    return math.floor( math.sqrt (height-z) )  # Parabola
+    return round( math.sqrt( 5*x ) ) # Parabola
 
 # ---------------------------------
 
@@ -69,7 +75,7 @@ def draw_circle(r,center):
     z = center[2]
     prev_y = r
     for x in range(r+1):
-        y = math.floor( math.sqrt( (r**2) - ((x)**2)) )
+        y = round( math.sqrt( (r**2) - ((x)**2)) )
         plot_point(x+shift_x,y+shift_y,z)
         plot_point(x+shift_x,-y+shift_y,z)
         plot_point(-x+shift_x,y+shift_y,z)
