@@ -1,1 +1,7 @@
-minecraft_server*
+server/banned-ips.json
+server/banned-players.json
+server/logs
+server/ops.json
+server/usercache.json
+server/whitelist.json
+server/world
