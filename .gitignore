@@ -1,3 +1,4 @@
+server/server.jar # Too big!
 server/banned-ips.json
 server/banned-players.json
 server/logs
