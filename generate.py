@@ -8,53 +8,41 @@ from os import system
 DEFAULT_SUBSTANCE = 'smooth_stone'
 
 # Offsets determine the origin point (0,0,0) in 3D space
-x_offset = 0
-y_offset = 0
+x_offset = 8
+y_offset = 8
 z_offset = 5
 
-height = 9
-length = 17
-bredth = 17
-
-structure = height * [ bredth * [ length * [ False ] ] ] 
-#structure = [ [ [ False for _ in range(length) ] for _ in range(bredth) ] for _ in range(height) ]
+height = 18
+length = height*2
+bredth = height*2
 
 def main():
-    # Clear the area and place markers
+    # Clear area
     fill(0,0,0,length,bredth,height,'air')
-    plot_point(-1,-1,-1,'red_concrete')
-    plot_point(-1,bredth+1,-1,'red_concrete')
-    plot_point(length+1,-1,-1,'red_concrete')
-    plot_point(length+1,bredth+1,-1,'red_concrete')
-    plot_point(-1,-1,height+1,'blue_concrete')
-    plot_point(-1,bredth+1,height+1,'blue_concrete')
-    plot_point(length+1,-1,height+1,'blue_concrete')
-    plot_point(length+1,-1,height+1,'blue_concrete')
+    fill(0,0,0,-length,bredth,height,'air')
+    fill(0,0,0,length,-bredth,height,'air')
+    fill(0,0,0,-length,-bredth,height,'air')
 
-
-    # fill 3D map 'structure' with shapes
     fill_structure()
-
-    time.sleep(3)
-    for z, z_list in enumerate(structure):
-        for y, y_list in enumerate(z_list):
-            for x, x_list in enumerate(y_list):
-                if(structure[z][y][x]):
-                    plot_point(x,y,z)
-        time.sleep(1)
 
 
 # This is the function which actually defines the 3D shape
 # Change this according to your needs
 #TODO: Externalisation
 def fill_structure():
-    for z, _ in enumerate(structure):
+    # Central pillar
+    fill(0,0,0,0,0,height)
+
+    # Dome
+    for z in range(height):
+        center=(0,0,z)
         r = radius_at_level(z)
-        print(z,r)
-        structure[z] = moved(circle(radius=r), z)
+        draw_circle(r,center)
+        time.sleep(1)
 
 def radius_at_level(z):
-    return math.floor( math.sqrt ( 8**2 - z**2 ) ) -1 
+    #return math.floor( math.sqrt ( height**2 - z**2 ) ) -1  # Circle
+    return math.floor( math.sqrt (height-z) )  # Parabola
 
 # ---------------------------------
 
@@ -75,34 +63,26 @@ def moved(matrix, distance):
 
 # ---- Common Shapes --------------
 # Each function returns 2d array
-
-def circle(radius=1):
-    # Actual size of circle is 1+diameter
-    # Equation of shifted circle: (x-a)^2 + (y-b)^2 = r^2
-    # The following is expression for the above, but for y,
-    # shifted by r along both axes
-    shift = radius
-    size = (radius*2) + 1
-    circle = [ [ False for _ in range(size) ] for _ in range(size) ]
-    prev_y = radius
-    for x in range(radius+1):
-        y = math.floor( math.sqrt( (radius**2) - ((x)**2)) )
-        # Fill main points
-        #circle[y][x] = True
-        circle[y+shift][x+shift] = True
-        circle[y+shift][-x+shift] = True
-        circle[-y+shift][x+shift] = True
-        circle[-y+shift][-x+shift] = True
+def draw_circle(r,center):
+    shift_x = center[0]
+    shift_y = center[1]
+    z = center[2]
+    prev_y = r
+    for x in range(r+1):
+        y = math.floor( math.sqrt( (r**2) - ((x)**2)) )
+        plot_point(x+shift_x,y+shift_y,z)
+        plot_point(x+shift_x,-y+shift_y,z)
+        plot_point(-x+shift_x,y+shift_y,z)
+        plot_point(-x+shift_x,-y+shift_y,z)
         # Fill empty x spaces if the y jump is too steep
         if prev_y - y > 1:
             for fill_y in range(y+1, prev_y):
-                #circle[fill_y][x-1] = True
-                circle[fill_y+shift][x-1+shift] = True
-                circle[fill_y+shift][-x+1+shift] = True
-                circle[-fill_y+shift][x-1+shift] = True
-                circle[-fill_y+shift][-x+1+shift] = True
+                plot_point(x-1+shift_x,fill_y+shift_y,z)
+                plot_point(x-1+shift_x,-fill_y+shift_y,z)
+                plot_point(-x+1+shift_x,fill_y+shift_y,z)
+                plot_point(-x+1+shift_x,-fill_y+shift_y,z)
         prev_y = y
-    return circle
+
 # ---------------------------------
 
 
@@ -120,7 +100,7 @@ def fill(x1, y1, z1, x2, y2, z2, substance=DEFAULT_SUBSTANCE):
     send_cmd("fill {} {} {} {} {} {} {}".format(x1, z1, y1, x2, z2, y2, substance))
 
 def send_cmd(cmd):
-    #print(cmd)
+    print(cmd)
     cmd = cmd + "\\n"
     subprocess.call(["screen", "-S", "minecraft", "-X", "stuff", "{}".format(cmd)])
 
@@ -141,4 +121,3 @@ def print_2d(array_2d):
         print(line)
 
 main()
-#print_2d(moved(circle(4), 0))
