@@ -38,8 +38,8 @@ def fill_structure():
     for z in range(height):
         center=(0,0,z)
         r = radius_at_level(z)
-        draw_circle(r,center)
-        #time.sleep(1)
+        circle_radial(r,center)
+        time.sleep(1)
 
 def radius_at_level(z):
     # Tip: To picture this curve better, just rotate your imaginary x-y axis
@@ -75,7 +75,7 @@ def draw_circle(r,center):
     z = center[2]
     prev_y = r
     for x in range(r+1):
-        y = round( math.sqrt( (r**2) - ((x)**2)) )
+        y = math.floor( math.sqrt( (r**2) - ((x)**2)) )
         plot_point(x+shift_x,y+shift_y,z)
         plot_point(x+shift_x,-y+shift_y,z)
         plot_point(-x+shift_x,y+shift_y,z)
@@ -88,6 +88,16 @@ def draw_circle(r,center):
                 plot_point(-x+1+shift_x,fill_y+shift_y,z)
                 plot_point(-x+1+shift_x,-fill_y+shift_y,z)
         prev_y = y
+
+def circle_radial(r,center):
+    shift_x = center[0]
+    shift_y = center[1]
+    z = center[2]
+    for theta in range(0,361):
+        print(theta)
+        x = round(r * math.cos(math.radians(theta)))
+        y = round(r * math.sin(math.radians(theta)))
+        plot_point(x,y,z)
 
 # ---------------------------------
 
