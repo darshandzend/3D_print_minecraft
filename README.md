@@ -1,5 +1,8 @@
 # 3D Print minecraft structures with mathematical functions
 
+https://user-images.githubusercontent.com/4941002/138025226-a1703ead-04fb-48b7-a994-c3c429587f2c.mp4
+
+
 ## Components
 1. Python 3
 2. Minecraft Server 1.16
@@ -13,5 +16,6 @@
 3. 'Screen' connects to this terminal to send minecraft commands
 4. `generate.py` generates y and z coordinates (corrosponding to x) with specified functions
 5. `generate.py` also sends the `screen` commands to the minecraft server
+
 
 
