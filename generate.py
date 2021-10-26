@@ -29,12 +29,6 @@ if args.erase:
     SUBSTANCE = 'air'
 
 def main():
-    # Clear area
-    fill(0,0,0,length,bredth,height,'air')
-    fill(0,0,0,-length,bredth,height,'air')
-    fill(0,0,0,length,-bredth,height,'air')
-    fill(0,0,0,-length,-bredth,height,'air')
-
     fill_structure()
 
 # This is the function which actually defines the 3D shape
@@ -45,20 +39,27 @@ def fill_structure():
     # The size of these squares reduces with height
     # The center of these squares shifts rightwards parabolically
 
-    last_x = 0
+    last_y = 0
     for z in range(height):
         size = size_of_square_at(z)
         if size > 0:
-            center = center_of_square_at(z)
-            square(size,center)
-            print(last_x)
+            base_center = center_of_square_at(z)
+            #square(size,center)
+            room(size,4,base_center)
             # Pillars
-            if size > 1:
-                for x in range(min(last_x,center[0]), max(last_x,center[0])):
-                    if x%4 == 0:
-                        print("pillar", x)
-                        fill(x, x, 0, x, x, center[2])
-            last_x = center[0]
+            for y in range(min(last_y,base_center[1]), max(last_y,base_center[1])):
+                if y > -48 and y%4 == 0:
+                    print(y)
+                    fill(0, y, 0, 0, y, base_center[2],'quartz_pillar')
+            last_y = base_center[1]
+
+    # Hollow out
+    for z in range(height):
+        size = size_of_square_at(z)
+        if size > 0:
+            base_center = center_of_square_at(z)
+            #square(size,center)
+            hollow(size,4,base_center)
 
 
 def size_of_square_at(z):
@@ -69,7 +70,26 @@ def size_of_square_at(z):
 def center_of_square_at(z):
     # https://www.desmos.com/calculator/p3jcvetpdm
     shift = round(math.sqrt( 52**2 - z**2) ) - 52
-    return (shift,shift,z)
+    return (0,shift,z)
+
+def room(side, height, center):
+    half = int(side/2)
+    h = height-1
+    # Create solid cuboid
+    fill(
+        center[0]-half, center[1]-half, center[2],
+        center[0]+half, center[1]+half, center[2]+h,
+    )
+def hollow(side,height,center):
+    half = int(side/2)
+    h = height-1
+    # Hollow it out by creating an air cuboid inside
+    fill(
+        center[0]-half+1, center[1]-half+1, center[2]+1,
+        center[0]+half-1, center[1]+half-1, center[2]+h-1,
+        'air'
+    )
+
 
 def radius_at_level(z):
     # Tip: To picture this curve better, just rotate your imaginary x-y axis
@@ -103,7 +123,7 @@ def square(side, center):
         fill(
             center[0]-half, center[1]-half, center[2],
             center[0]+half, center[1]+half, center[2],
-          )
+        )
 
 
 def draw_circle(r, center):
@@ -144,6 +164,8 @@ def plot_point(x,y,z,substance=SUBSTANCE):
     fill(x, y, z, x, y, z, substance)
 
 def fill(x1, y1, z1, x2, y2, z2, substance=SUBSTANCE):
+    if args.erase:
+        substance = 'air'
     x1 += x_offset
     x2 += x_offset
     y1 += y_offset
